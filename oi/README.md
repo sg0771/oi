@@ -1,14 +1,6 @@
 # NOI相关文档
-所有文章存放在 noi 目录，点击下面的标题即可浏览内容。
+所有文章存放在 oi 目录，点击下面的标题即可浏览内容。
 
 ## 文章目录
 
-- [CSP-J-2021-T4-小熊的果篮](/noi/CSP-J-2021-T4-%E5%B0%8F%E7%86%8A%E7%9A%84%E6%9E%9C%E7%AF%AE.md)
-- [CSP-J-2020-T4-方格取数](/noi/CSP-J-2020-T4-%E6%96%B9%E6%A0%BC%E5%8F%96%E6%95%B0.md)
-- [CSP-J-2020-T3-表达式](/noi/CSP-J-2020-T3-%E8%A1%A8%E8%BE%BE%E5%BC%8F.md)
-- [CSP-J-2019-T4-加工零件](/noi/CSP-J-2019-T4-%E5%8A%A0%E5%B7%A5%E9%9B%B6%E4%BB%B6.md)
-- [CSP-J_2019-T4](/noi/CSP-J_2019-T4.md)
-- [CSP-J 2019-T4(BFS图)](/noi/CSP-J%202019-T4(BFS%E5%9B%BE).md)
-- [CSP-J 2019-T4(BFS图).CPP](/noi/CSP-J%202019-T4(BFS%E5%9B%BE).CPP.md)
-- [CCF CSP-J 2025第二轮入门组一级名单](/noi/CCF%20CSP-J%202025%E7%AC%AC%E4%BA%8C%E8%BD%AE%E5%85%A5%E9%97%A8%E7%BB%84%E4%B8%80%E7%BA%A7%E5%90%8D%E5%8D%95.md)
-- [完全背包](/noi/2010-02-26-%E5%AE%8C%E5%85%A8%E8%83%8C%E5%8C%85.md)
+
