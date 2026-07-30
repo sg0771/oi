@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>blog.xkt.space</title>
+  <!-- 主题样式 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify/themes/vue.css">
+  <!-- KaTeX 公式样式 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <style>
+    :root {
+      --topbar-height: 48px;
+      --topbar-border: #e6e6e6;
+      --topbar-text: #1f3349;
+      --topbar-muted: #5d6b7a;
+      --topbar-accent: #42b983;
+    }
+
+    body {
+      padding-top: var(--topbar-height);
+    }
+
+    .docs-topbar {
+      align-items: center;
+      background: #fff;
+      border-bottom: 1px solid var(--topbar-border);
+      box-sizing: border-box;
+      display: flex;
+      gap: 18px;
+      height: var(--topbar-height);
+      justify-content: space-between;
+      left: 0;
+      padding: 0 18px;
+      position: fixed;
+      right: 0;
+      top: 0;
+      z-index: 80;
+    }
+
+    .docs-topbar-title {
+      color: var(--topbar-text);
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1;
+      text-decoration: none;
+    }
+
+    .sidebar-switch {
+      align-items: center;
+      background: transparent;
+      border: 0;
+      color: var(--topbar-muted);
+      cursor: pointer;
+      display: inline-flex;
+      font: inherit;
+      gap: 8px;
+      padding: 0;
+    }
+
+    .sidebar-switch:focus-visible {
+      outline: 2px solid var(--topbar-accent);
+      outline-offset: 4px;
+    }
+
+    .sidebar-switch-track {
+      background: var(--topbar-accent);
+      border-radius: 999px;
+      display: inline-flex;
+      height: 22px;
+      padding: 2px;
+      transition: background 0.2s ease;
+      width: 42px;
+    }
+
+    .sidebar-switch-thumb {
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+      height: 18px;
+      transform: translateX(20px);
+      transition: transform 0.2s ease;
+      width: 18px;
+    }
+
+    .sidebar-switch-text {
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .sidebar,
+    .content {
+      top: var(--topbar-height);
+    }
+
+    .sidebar {
+      transition: transform 0.25s ease;
+    }
+
+    .content {
+      transition: left 0.25s ease;
+    }
+
+    body.sidebar-hidden .sidebar {
+      transform: translateX(-100%);
+    }
+
+    body.sidebar-hidden .content {
+      left: 0;
+    }
+
+    body.sidebar-hidden .sidebar-toggle {
+      display: none;
+    }
+
+    body.sidebar-hidden .sidebar-switch-track {
+      background: #a7b0ba;
+    }
+
+    body.sidebar-hidden .sidebar-switch-thumb {
+      transform: translateX(0);
+    }
+
+    @media screen and (max-width: 768px) {
+      .content {
+        left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="docs-topbar">
+    <a class="docs-topbar-title" href="#/">blog.xkt.space</a>
+    <button class="sidebar-switch" id="sidebarSwitch" type="button" role="switch" aria-checked="true" aria-label="隐藏左边栏">
+      <span class="sidebar-switch-text">左边栏</span>
+      <span class="sidebar-switch-track" aria-hidden="true">
+        <span class="sidebar-switch-thumb"></span>
+      </span>
+    </button>
+  </header>
+  <div id="app"></div>
+
+  <script>
+    const sidebarStorageKey = 'docsify-sidebar-visible';
+
+    function setSidebarVisible(visible) {
+      document.body.classList.toggle('sidebar-hidden', !visible);
+
+      const switchButton = document.getElementById('sidebarSwitch');
+      if (!switchButton) return;
+
+      switchButton.setAttribute('aria-checked', String(visible));
+      switchButton.setAttribute('aria-label', visible ? '隐藏左边栏' : '显示左边栏');
+    }
+
+    function initSidebarSwitch() {
+      const switchButton = document.getElementById('sidebarSwitch');
+      const savedValue = localStorage.getItem(sidebarStorageKey);
+      const initialVisible = savedValue === null ? true : savedValue === 'true';
+
+      setSidebarVisible(initialVisible);
+
+      switchButton.addEventListener('click', function () {
+        const visible = document.body.classList.contains('sidebar-hidden');
+        localStorage.setItem(sidebarStorageKey, String(visible));
+        setSidebarVisible(visible);
+      });
+    }
+
+    initSidebarSwitch();
+
+    function renderKatex(math, displayMode) {
+      if (!window.katex) return null;
+
+      return katex.renderToString(math, {
+        displayMode: displayMode,
+        throwOnError: false
+      });
+    }
+
+    function replaceMath(text) {
+      text = text.replace(/\$\$([\s\S]+?)\$\$/g, function (_, math) {
+        return renderKatex(math, true) || _;
+      });
+
+      text = text.replace(/\\\[([\s\S]+?)\\\]/g, function (_, math) {
+        return renderKatex(math, true) || _;
+      });
+
+      text = text.replace(/\\\(([\s\S]+?)\\\)/g, function (_, math) {
+        return renderKatex(math, false) || _;
+      });
+
+      return text.replace(/(^|[^\\])\$([^\n$]+?)\$/g, function (_, prefix, math) {
+        return prefix + (renderKatex(math, false) || ('$' + math + '$'));
+      });
+    }
+
+    function renderMathInMarkdown(markdown) {
+      return markdown
+        .split(/(```[\s\S]*?```|~~~[\s\S]*?~~~)/g)
+        .map(function (block, index) {
+          if (index % 2 === 1) return block;
+
+          return block
+            .split(/(`+[^`\n]*`+)/g)
+            .map(function (part, partIndex) {
+              return partIndex % 2 === 1 ? part : replaceMath(part);
+            })
+            .join('');
+        })
+        .join('');
+    }
+
+    window.$docsify = {
+      name: 'blog.xkt.space',
+      repo: '',
+      homepage: 'README.md',
+      search: {
+        placeholder: '搜索内容...',
+        noData: '无匹配内容',
+        pathNamespaces: '/'
+      },
+      subMaxLevel: 3,
+      loadSidebar: true,
+      alias: {
+        '/.*/_sidebar.md': '/_sidebar.md'
+      },
+      auto2top: true,
+      markdown: {
+        smartypants: true
+      },
+      plugins: [
+        function (hook) {
+          hook.beforeEach(function (markdown, next) {
+            next(renderMathInMarkdown(markdown));
+          });
+        }
+      ],
+      // 404页面兜底
+      notFoundPage: '_404.md'
+    }
+  </script>
+
+  <!-- KaTeX 数学公式渲染 -->
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+  <!-- Docsify 核心与搜索插件 -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+</body>
+</html>
