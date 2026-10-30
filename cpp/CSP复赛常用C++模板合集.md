@@ -1,53 +1,20 @@
-# CSP 复赛常用C++算法模板合集
-> 全部模板可直接复制到CSP比赛环境使用，逐行注释，覆盖CSP-J/S所有高频考点。编译标准：C++14 / C++17。
-
----
-
-## 1. 基础工具
-### 快读模板（处理1e6以上输入）
-```cpp
+## 万能头
+~~~cpp
 #include <bits/stdc++.h>
 using namespace std;
-// 快速读入整数，比cin快10倍以上
-inline int read() {
-    int x = 0, f = 1; char ch = getchar();
-    // 处理负号
-    while (ch < '0' || ch > '9') { if (ch == '-') f = -1; ch = getchar(); }
-    // 拼接数字
-    while (ch >= '0' && ch <= '9') { x = x * 10 + ch - '0'; ch = getchar(); }
-    return x * f;
-}
+#define long long ll  #很多乘加运算用long容易溢出
 int main() {
-    int n = read(); // 直接调用读入
+    ## 优化标准 I/O 读取速度
+    ios::sync_with_stdio(false);//关闭同步，不能混用 cin 和 scanf /cout 和 printf
+    cin.tie(0);
+    // CSP复赛一定要写freopen！测试时注释掉
+    freopen("xxx.in", "r", stdin);//题目会指定输入输出
+    freopen("xxx.out", "w", stdout);
+    // ⚠️ 一定要用 '\n'，不要 endl！endl 会强制刷新缓冲区，很慢
+    // 你的代码
     return 0;
 }
-```
-
-### 常用头文件与宏
-```cpp
-#include <bits/stdc++.h>
-using namespace std;
-typedef long long ll;
-const int MOD = 1e9 + 7;
-const int INF = 0x3f3f3f3f; // 表示正无穷
-// 取模安全减法：避免负数
-ll mod_sub(ll a, ll b, ll mod) { return ((a - b) % mod + mod) % mod; }
-```
-
----
-
-## 2. 数论模块
-### 欧几里得算法求gcd
-```cpp
-ll gcd(ll a, ll b) {
-    // 辗转相除，直到b为0
-    return b == 0 ? a : gcd(b, a % b);
-}
-ll lcm(ll a, ll b) {
-    // 最小公倍数，先除后乘防溢出
-    return a / gcd(a, b) * b;
-}
-```
+~~~
 
 ### 快速幂（模意义下）
 ```cpp
@@ -94,70 +61,6 @@ void sieve() {
 }
 ```
 
----
-
-## 3. 数据结构模块
-### 并查集（路径压缩+按秩合并）
-```cpp
-const int MAXN = 1e5 + 10;
-int fa[MAXN], rnk[MAXN];
-// 初始化：每个点的父节点是自己，秩为1
-void init_dsu(int n) {
-    for (int i = 1; i <= n; i++) fa[i] = i, rnk[i] = 1;
-}
-// 找根节点，带路径压缩
-int find(int x) {
-    return fa[x] == x ? x : fa[x] = find(fa[x]);
-}
-// 合并两个集合
-void unite(int x, int y) {
-    x = find(x), y = find(y);
-    if (x == y) return;
-    // 小树接到大树下面，保持平衡
-    if (rnk[x] < rnk[y]) swap(x, y);
-    fa[y] = x;
-    rnk[x] += rnk[y];
-}
-```
-
-### 堆优化Dijkstra最短路
-```cpp
-#include <vector>
-#include <queue>
-const int MAXN = 1e5 + 10;
-const ll INF = 1e18;
-struct Edge { int to; ll w; };
-vector<Edge> g[MAXN]; // 邻接表存图
-ll dis[MAXN];
-bool vis[MAXN];
-
-// 从起点s出发，求到所有点的最短路
-void dijkstra(int s, int n) {
-    // 初始化距离为无穷大
-    for (int i = 1; i <= n; i++) dis[i] = INF, vis[i] = false;
-    dis[s] = 0;
-    // 小根堆：{距离, 节点}
-    priority_queue<pair<ll, int>, vector<pair<ll, int>>, greater<pair<ll, int>>> pq;
-    pq.push({0, s});
-    while (!pq.empty()) {
-        auto [d, u] = pq.top(); pq.pop();
-        if (vis[u]) continue;
-        vis[u] = true;
-        // 松弛相邻边
-        for (auto e : g[u]) {
-            int v = e.to; ll w = e.w;
-            if (dis[v] > dis[u] + w) {
-                dis[v] = dis[u] + w;
-                pq.push({dis[v], v});
-            }
-        }
-    }
-}
-```
-
----
-
-## 4. 搜索与DP模块
 ### BFS模板（无权图最短路）
 ```cpp
 #include <queue>
@@ -187,29 +90,39 @@ void bfs(int sx, int sy) {
 }
 ```
 
-### 01背包DP模板
-```cpp
-// n个物品，背包总容量W
-// w[i]是物品重量，v[i]是物品价值
-int n, W;
-int w[1005], v[1005];
-int dp[1005]; // dp[j]表示容量j的背包能装的最大价值
-
-void knapsack() {
-    memset(dp, 0, sizeof(dp));
-    for (int i = 1; i <= n; i++) {
-        // 逆序遍历，防止重复选同一物品
-        for (int j = W; j >= w[i]; j--) {
+### 0-1,完全背包
+~~~cpp
+//N  为物品数量
+//V  为背包容量
+//第 i 件物品的体积是 Wi，价值是 Vi
+​
+//0-1背包
+int solve_01_knapsack(int N, int V, const vector<int>& w, const vector<int>& v) {
+    vector<int> dp(V + 1, 0);//初始化一个长度为V+1的全0数组，注意从下标从0开始
+    for (int i = 0; i < N; ++i) {
+        // 必须逆序枚举容量！
+        // 保证计算 dp[j] 时用到的 dp[j - w[i]] 仍然是上一层(i-1) 的状态
+        for (int j = V; j >= w[i]; --j) {
             dp[j] = max(dp[j], dp[j - w[i]] + v[i]);
         }
     }
-    // 答案是dp[W]
+    return dp[V];
 }
-```
 
----
+//完全背包
+int solve_complete_knapsack(int N, int V, const vector<int>& w, const vector<int>& v) {
+   vector<int> dp(V + 1, 0);//初始化一个长度为V+1的全0数组，注意从下标从0开始
+    for (int i = 0; i < N; ++i) {
+        // 正序枚举容量，允许同一种物品被多次选取
+        for (int j = w[i]; j <= V; ++j) {
+            dp[j] = max(dp[j], dp[j - w[i]] + v[i]);
+        }
+    }
+    return dp[V];
+}
+~~~
 
-## 5. 二分答案模板
+##  二分答案模板
 ```cpp
 // 题目：求最大值最小，check(x)表示x是否满足条件
 bool check(int x) {
