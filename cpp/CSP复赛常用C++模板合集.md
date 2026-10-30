@@ -15,7 +15,6 @@ int main() {
     return 0;
 }
 ~~~
-
 ### 快速幂（模意义下）
 ```cpp
 // 计算 (base^power) % mod，O(log power)
@@ -60,7 +59,6 @@ void sieve() {
     }
 }
 ```
-
 ### BFS模板（无权图最短路）
 ```cpp
 #include <queue>
@@ -89,13 +87,11 @@ void bfs(int sx, int sy) {
     }
 }
 ```
-
 ### 0-1,完全背包
 ~~~cpp
 //N  为物品数量
 //V  为背包容量
 //第 i 件物品的体积是 Wi，价值是 Vi
-​
 //0-1背包
 int solve_01_knapsack(int N, int V, const vector<int>& w, const vector<int>& v) {
     vector<int> dp(V + 1, 0);//初始化一个长度为V+1的全0数组，注意从下标从0开始
@@ -121,7 +117,6 @@ int solve_complete_knapsack(int N, int V, const vector<int>& w, const vector<int
     return dp[V];
 }
 ~~~
-
 ##  二分答案模板
 ```cpp
 // 题目：求最大值最小，check(x)表示x是否满足条件
