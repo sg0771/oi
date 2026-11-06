@@ -1,1 +1,1 @@
-export const blogDirs = ['cpp','csp_j','csp_s','list'];
+export const blogDirs = ['cpp','csp_j','csp_s','list','test'];
